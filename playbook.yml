@@ -2,8 +2,8 @@
 - hosts: all
   sudo: true
   vars:
-    document_root: /home/vagrant/public_html  
-    pre_tasks:
+    document_root: /home/vagrant/www  
+  pre_tasks:
     - name: update apt cache
       apt: update_cache=yes
   roles:

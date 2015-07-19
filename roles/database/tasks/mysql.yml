@@ -1,0 +1,39 @@
+---
+- name: Install mysql packages
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items:
+    - mysql-server
+    - mysql-client
+    - python-mysqldb
+    - php5-mysql
+    - libapache2-mod-auth-mysql
+  notify:
+    start mysql
+
+- name: create mysql root pass
+  command: /usr/bin/openssl rand -base64 16
+  register: mysql_root_passwd
+
+- name: copy my.cnf
+  template:
+    src=my.cnf.j2
+    dest=/home/vagrant/.my.cnf
+    owner=root
+    group=root
+    mode=0600
+  notify:
+    - restart mysql
+
+- name: update mysql root password for all root accounts
+  mysql_user: name=root host={{ item }} password={{ mysql_root_passwd.stdout }} state=present login_user=root login_password=
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+#- name: delete anonymous mysql user
+#  mysql_user: name="" state=absent login_user=root login_password=
+
+#- name: remove mysql test database
+#  mysql_db: name=test state=absent login_user=root login_password=
