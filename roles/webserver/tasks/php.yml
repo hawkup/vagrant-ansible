@@ -1,6 +1,12 @@
 ---
 - name: install php
   apt: name=php5 state=present
+- name: install php mcrypt
+  apt: name=php5-mcrypt state=present
+- name: enable mcrypt
+  shell: php5enmod mcrypt
+  notify:
+  - reload apache
 - name: install composer
   shell: curl -sS https://getcomposer.org/installer | php
 - name: global composer
